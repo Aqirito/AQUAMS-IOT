@@ -3,11 +3,12 @@ import dht
 import utime
 import ubinascii
 from umqttsimple import MQTTClient
+import ujson
 
 DHT_sensor = dht.DHT22(machine.Pin(15))
 
 '''MQTT'''
-mqtt_server = 'your server IP address: Raspberry pi IP address'
+mqtt_server = '192.168.1.101'
 client_id = ubinascii.hexlify(machine.unique_id()) # create a random client_id
 topic_sub = 'server' # your desired topic for subs
 topic_pub = 'DHT_sensor' # your desired topic for pubs
@@ -44,6 +45,7 @@ def run():
     global last_message, message_interval
     while True:
         try:
+            client.check_msg()
             if (utime.time() - last_message) > message_interval:
                 DHT_sensor.measure()
                 temp = DHT_sensor.temperature()
@@ -60,4 +62,6 @@ def run():
         except OSError as e:
             print('Failed to read sensor. reconnecting')
             restart_and_reconnect()
+            
+run()
 
